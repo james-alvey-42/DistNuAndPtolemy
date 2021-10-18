@@ -1,0 +1,47 @@
+# Case 3: High Energy Neutrinos
+
+data.experiments=['cmb_s4']
+
+data.parameters['omega_b']	= [  2.2377,   None, None,	0.015, 0.01, 'cosmo']
+data.parameters['omega_cdm']    = [ 0.12010,   None, None,     0.0013,    1, 'cosmo']
+data.parameters['100*theta_s']  = [ 1.04110,   None, None,    0.00030,    1, 'cosmo']
+data.parameters['ln10^{10}A_s'] = [  3.0447,   None, None,	0.015,    1, 'cosmo']
+data.parameters['n_s']          = [  0.9659,   None, None,     0.0042,    1, 'cosmo']
+data.parameters['tau_reio']     = [  0.0543,  0.004, None,	0.008,    1, 'cosmo']
+data.parameters['m_ncdm']	= [2.0, 0., 5., 0.1, 1., 'cosmo']
+
+data.parameters['Neffncdm']     = [3.045, 0., 10., 0, 1., 'cosmo']
+data.parameters['logystar']     = [1.47712, 0.00001, 200., 0, 1., 'cosmo']
+data.parameters['logsigmastar'] = [0.68314, 0.000001, 20., 0, 1., 'cosmo']
+data.parameters['Tempncdm']     = [1e-3, -1.5, 2., 0, 1., 'cosmo']
+data.parameters['Gauss']        = [1., -1.5, 2., 0, 1., 'cosmo']
+
+# Derived parameters
+
+data.parameters['z_reio']          = [1, None, None, 0,     1,   'derived']
+data.parameters['Omega_Lambda']    = [1, None, None, 0,     1,   'derived']
+data.parameters['H0']              = [0, None, None, 0,     1,   'derived']
+data.parameters['A_s']             = [0, None, None, 0,  1e-9,   'derived']
+data.parameters['sigma8']          = [0, None, None, 0,     1,   'derived']
+
+# Fix YHe
+data.cosmo_arguments['YHe'] = 0.2454006
+data.cosmo_arguments['k_pivot'] = 0.05
+
+# NCDM Parameters
+
+data.cosmo_arguments['N_ur'] = 0.
+# data.cosmo_arguments['T_ncdm'] = 0.716445
+data.cosmo_arguments['N_ncdm'] = 1
+
+# These two are required to get sigma8 as a derived parameter
+# (class must compute the P(k) until sufficient k)
+data.cosmo_arguments['gauge'] = 'synchronous'
+data.cosmo_arguments['tol_ncdm_synchronous'] = 1e-4
+data.cosmo_arguments['output'] = 'mPk'
+data.cosmo_arguments['P_k_max_h/Mpc'] = 1.
+
+#------ Mcmc parameters ----
+
+data.N=350000
+data.write_step=1

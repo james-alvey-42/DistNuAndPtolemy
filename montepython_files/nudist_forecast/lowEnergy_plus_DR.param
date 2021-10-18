@@ -1,0 +1,47 @@
+# Case 2: Low Energy Neutrinos + Dark Radiation
+
+data.experiments=['cmb_s4']
+
+data.parameters['omega_b']	= [  2.2377,   None, None,	0.015, 0.01, 'cosmo']
+data.parameters['omega_cdm']    = [ 0.12010,   None, None,     0.0013,    1, 'cosmo']
+data.parameters['100*theta_s']  = [ 1.04110,   None, None,    0.00030,    1, 'cosmo']
+data.parameters['ln10^{10}A_s'] = [  3.0447,   None, None,	0.015,    1, 'cosmo']
+data.parameters['n_s']          = [  0.9659,   None, None,     0.0042,    1, 'cosmo']
+data.parameters['tau_reio']     = [  0.0543,  0.004, None,	0.008,    1, 'cosmo']
+data.parameters['m_ncdm']	= [0.04, 0., 5., 0.1, 1., 'cosmo']
+
+data.parameters['Neffncdm']     = [0.5, 0., 10., 0, 1., 'cosmo']
+data.parameters['logystar']     = [-1.0, 0.00001, 2., 0, 1., 'cosmo']
+data.parameters['logsigmastar'] = [-0.53133, 0.000001, 2., 0, 1., 'cosmo']
+data.parameters['Tempncdm']     = [1e-3, -1.5, 2., 0, 1., 'cosmo']
+data.parameters['Gauss']        = [1., -1.5, 2., 0, 1., 'cosmo']
+
+# Derived parameters
+
+data.parameters['z_reio']          = [1, None, None, 0,     1,   'derived']
+data.parameters['Omega_Lambda']    = [1, None, None, 0,     1,   'derived']
+data.parameters['H0']              = [0, None, None, 0,     1,   'derived']
+data.parameters['A_s']             = [0, None, None, 0,  1e-9,   'derived']
+data.parameters['sigma8']          = [0, None, None, 0,     1,   'derived']
+
+# Other cosmo parameters (fixed parameters, precision parameters, etc.)
+
+# Fix YHe
+data.cosmo_arguments['YHe'] = 0.2454006
+data.cosmo_arguments['k_pivot'] = 0.05
+
+# NCDM Parameters
+
+data.cosmo_arguments['N_ur'] = 2.54529
+# data.cosmo_arguments['T_ncdm'] = 0.716445
+data.cosmo_arguments['N_ncdm'] = 1
+
+data.cosmo_arguments['gauge'] = 'synchronous'
+data.cosmo_arguments['tol_ncdm_synchronous'] = 1e-3
+data.cosmo_arguments['output'] = 'mPk'
+data.cosmo_arguments['P_k_max_h/Mpc'] = 1.
+
+#------ Mcmc parameters ----
+
+data.N=350000
+data.write_step=1
