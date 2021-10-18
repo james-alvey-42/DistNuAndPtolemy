@@ -1,4 +1,4 @@
-# Cosmic Neutrino Distribution Function
+# Neutrino Distributions and Ptolemy
 Repository for calculating cosmological obsevables and performing MCMC analysis for neutrinos with a distribution function different to a thermal Fermi-Dirac one. Also contains code to compute event rates and sensitivity at a Ptolemy-like experiment for neutrions with a given distribution function and mass.
 
 ## File Structure
