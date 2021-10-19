@@ -13,9 +13,19 @@ Repository for calculating cosmological obsevables and performing MCMC analysis 
 
 *planck_sensitivity.txt* - optimal sensitivity of a Planck like experiment to modified distribution functions, as compared to a fiducial Fermi-Dirac distribution with the same non-relativistic/relativistic energy density in neutrinos
 
+*[t]Tyrs_[d]Delta_[m]mT_[o]order_[s]spin_[b]GammaB.txt* - text files containing the sensitivity data for a selection of the fiducial/experimental parameters. All files follow this file naming format, and are read automatically by the corresponding load_ptolemy() function in utils.py.
+
+*lowT_clustering_[].txt* - clustering factor as a function of lightest neutrino mass
+
 **/plotting/**
 
 *dist_sensitivity.py* - plotting for the sensitivity of CMB-S4/Planck like experiments to modified distribution functions
+
+*utils.py* - selection of functions for loading data, plotting curves and adding labels etc.
+
+*main.py* - uses functions in utils.py to create the figures for the paper
+
+*plots/* - folder containing the relevant plots
 
 **/montepython_files/**
 
