@@ -3,6 +3,12 @@ Repository for calculating cosmological obsevables and performing MCMC analysis 
 
 ## File Structure
 
+**/analysis/**
+  
+*ptolemy_analysis.py* - main analysis framework for extracting the Ptolemy sensitivity, can be run directly and asks the user for a choice of exposure, neutrino mass ordering, tritium mass etc. Saves results to a designated file which is readable by plotting utils.
+
+*nu_clustering.py* - main file for computing the clustering factor within the linear regime given a choice of distribution function and neutrino mass
+
 **/class_files/**
   
 *background.c* - modified version of the corresponding source file in the class cosmological code. Contains implementation of a FD, as well as a Gaussian distribution (with an optional additional FD component) as specified by the ncdm_parameters (Neff, ystar, sigma, T_FD, gauss).
