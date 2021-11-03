@@ -11,7 +11,7 @@ class vectorize(np.vectorize):
         return functools.partial(__call__, obj)
 
 # Define order of Gaussian quadrature integration
-points, weights = np.polynomial.legendre.leggauss(200)
+points, weights = np.polynomial.legendre.leggauss(50)
 
 @vectorize
 def integrator(f, a, b):
@@ -120,7 +120,6 @@ def CNBfactor(mi, mlightest, Ee, delta, DEEnd=0.0):
     Eend = Eend0() - mlightest + DEEnd
     return np.exp(-(Ee - (Eend + mi + mlightest))**2 / (2 * delta**2/(8 * np.log(2))))
 
-@np.vectorize
 def dGtCNBdE(delta, m1, m2, m3, Ee, n0, NT, order='normal', DEEnd=0.0):
     '''
     Equation 3.10 - smeared CNB rate
@@ -131,7 +130,6 @@ def dGtCNBdE(delta, m1, m2, m3, Ee, n0, NT, order='normal', DEEnd=0.0):
     E1, E2, E3 = CNBfactor(m1, mlightest, Ee, delta, DEEnd=DEEnd), CNBfactor(m2, mlightest, Ee, delta, DEEnd=DEEnd), CNBfactor(m3, mlightest, Ee, delta, DEEnd=DEEnd)
     return np.sqrt(8 * np.log(2)) / (np.sqrt(2 * np.pi) * delta) * (Gamma1 * E1 + Gamma2 * E2 + Gamma3 * E3)
 
-@np.vectorize
 def dGtbdE(delta, m1, m2, m3, Ee, NT, order='normal', DEEnd=0.0):
     '''
     Equation 3.11 - smeared beta decay rate
@@ -186,8 +184,9 @@ if __name__ == '__main__':
     else:
         cDM_sim = 2.0
     border = 20
-    Nb_data = 1.05189 * (gamma_b/1e-5)
-    Ei_arr = np.linspace(Eend0() - 5000, Eend0() + 10000., int(15000/delta))
+    Elow, Ehigh = -5000.0, 10000.0
+    Ei_arr = np.linspace(Eend0() + Elow, Eend0() + Ehigh, int((Ehigh - Elow)/delta))
+    Nb_data = 1.05189 * (gamma_b/1e-5) * (Tyrs / 1.0)
 
     filename = '[t]{}_[d]{}_[m]{}_[o]{}_[s]{}_[b]{}.txt'.format(Tyrs, delta, mT, order.lower()[0], spin.lower()[0], gamma_b)
 
@@ -245,4 +244,4 @@ if __name__ == '__main__':
 
     result = Parallel(n_jobs=-1)(delayed(func)(n, m) for n, m in zip(nloc, mlight))
     to_save = np.vstack([mlight, nloc, result]).T
-    np.savetxt(filename, to_save)
+    np.savetxt(filename, to_save, header='mlight/meV nloc/cm-3 sensitivity')

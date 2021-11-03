@@ -111,7 +111,7 @@ def run_FD(ml, Tf=1.0, show_plot=False):
 
 	print('[nu_clustering.py] Starting mlight = {} eV, Tnu/Tnu0 = {}'.format(ml, Tf))
 	try:
-		deltanu_f = np.loadtxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}.txt'.format(logMvir, ml))
+		deltanu_f = np.loadtxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}_Tf{}.txt'.format(logMvir, ml, Tf))
 		run = False
 	except OSError:
 		run = True
@@ -136,8 +136,8 @@ def run_FD(ml, Tf=1.0, show_plot=False):
 				integrand_arr = np.append(integrand_arr, a * delta * diffs * F_factor)
 			deltanu = 4 * np.pi * G * RHO_M0 * simps(integrand_arr, s_arr)
 			deltanu_f = np.append(deltanu_f, deltanu)
-		np.savetxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}.txt'.format(logMvir, ml), deltanu_f)
-	deltanu_f = np.loadtxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}.txt'.format(logMvir, ml))
+		np.savetxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}_Tf{}.txt'.format(logMvir, ml, Tf), deltanu_f)
+	deltanu_f = np.loadtxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}_Tf{}.txt'.format(logMvir, ml, Tf))
 
 	deltanu_arr = np.array([])
 	for r in r_arr:
@@ -156,17 +156,16 @@ def run_FD(ml, Tf=1.0, show_plot=False):
 	return delta
 
 if __name__ == '__main__':
-	mlight_pts = input("[nu_clustering.py] num(mlightest): ")
-	filename = 'clustering_data/lcdm_clustering_[m]{}.txt'.format(mlight_pts)
+	pts = input("[nu_clustering.py] num(pts): ")
+	filename = 'clustering_data/lcdm_clustering_[t]{}.txt'.format(pts)
 	print('[nu_clustering.py] Save file: {}'.format(filename))
-	mlight_arr = np.geomspace(1e-3 * 10.0, 1e-3 * 1000.0, int(mlight_pts))
-
-	print(mlight_arr)
+	#mlight_arr = np.geomspace(1e-3 * 10.0, 1e-3 * 1000.0, int(mlight_pts))
+	Tf_arr = np.linspace(0.3, 1.3, int(pts))
 
 	result = np.array([])
-	for mlight in mlight_arr:
-		to_add = run_FD(mlight)
+	for Tfact in Tf_arr:
+		to_add = run_FD(ml=1.0, Tf=Tfact)
 		result = np.append(result, to_add)
 
-	to_save = np.vstack([mlight_arr, result]).T
-	np.savetxt(filename, to_save, header='mlight/eV delta')
+	to_save = np.vstack([Tf_arr, result]).T
+	np.savetxt(filename, to_save, header='[mlight=1.0 eV] Tf delta')
