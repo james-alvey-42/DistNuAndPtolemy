@@ -1,5 +1,5 @@
 # Neutrino Distributions and PTOLEMY
-Authors: James Alvey, Miguel Escudero, Nashwan Sabti
+**Authors:** James Alvey, Miguel Escudero, Nashwan Sabti
 
 Repository for calculating cosmological obsevables and performing MCMC analysis for neutrinos with a distribution function different to a thermal Fermi-Dirac one. Also contains code to compute event rates and sensitivity at a PTOLEMY-like experiment for neutrions with a given distribution function and mass.
 
