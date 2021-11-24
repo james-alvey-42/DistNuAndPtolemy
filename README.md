@@ -21,7 +21,7 @@ Repository for calculating cosmological obsevables and performing MCMC analysis 
 
 *[t]Tyrs_[d]Delta_[m]mT_[o]order_[s]spin_[b]GammaB.txt* - text files containing the sensitivity data for a selection of the fiducial/experimental parameters. All files follow this file naming format, and are read automatically by the corresponding load_ptolemy() function in utils.py.
 
-*lowT_clustering_[].txt* - clustering factor as a function of lightest neutrino mass
+*lowT.txt, LCDM.txt etc.* - clustering factor as a function of lightest neutrino mass for the various scenarios
 
 **/plotting/**
 
