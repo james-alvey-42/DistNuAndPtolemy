@@ -1,4 +1,6 @@
-# Neutrino Distributions and Ptolemy
+# Neutrino Distributions and PTOLEMY
+Authors: James Alvey, Miguel Escudero, Nashwan Sabti
+
 Repository for calculating cosmological obsevables and performing MCMC analysis for neutrinos with a distribution function different to a thermal Fermi-Dirac one. Also contains code to compute event rates and sensitivity at a Ptolemy-like experiment for neutrions with a given distribution function and mass.
 
 ## File Structure
@@ -48,3 +50,12 @@ Repository for calculating cosmological obsevables and performing MCMC analysis 
 */nu_run_files/* - bash files to run all cases in /nu_param_files/
 
 */nudist_forecast/* - param files for computing the fiducial sensitivity of CMB-S4 and Planck like experiments
+
+## Publications
+If you make use of this code in your publication, please cite the papers [2111.1] and [2111.2].
+
+## Contact
+Please email j.b.g.alvey@uva.nl, miguel.escudero@tum.de and nashwan.sabti@kcl.ac.uk for any questions.
+
+[2111.1]: https://arxiv.org
+[2111.2]: https://arxiv.org
