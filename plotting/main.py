@@ -382,7 +382,7 @@ def cosmo_appendix_nu(plot_dir='plots/', figname='cosmo_appendix_nu.pdf'):
 		transform=plt.gca().transAxes,
 		fontsize=18,
 		color='k')
-	plt.text(0.05, 0.035,r"$f_\nu = \Omega_\nu / \Omega_{\rm m} = 0.009$, $N_{\rm eff} = 3.044$",
+	plt.text(0.05, 0.035,r"$\Omega_{\nu,0} / \Omega_{\mathrm{m}, 0} = 0.009$, $N_{\rm eff} = 3.044$",
 		transform=plt.gca().transAxes,
 		fontsize=16,
 		color='k',

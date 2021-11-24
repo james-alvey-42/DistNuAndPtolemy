@@ -781,7 +781,7 @@ def plot_distribution_Pk(data_dir='../data/distribution_data/', labels=True):
 			color=cosmo_color('LTM'),
 			rotation=23)
 
-	plt.text(0.04,0.03,r"$\Omega_\nu / \Omega_\mathrm{m} = 0.009$",transform =plt.gca().transAxes,fontsize=16,color='k',rotation=0)
+	plt.text(0.04,0.03,r"$\Omega_{\nu,0} / \Omega_{\mathrm{m},0} = 0.009$",transform =plt.gca().transAxes,fontsize=16,color='k',rotation=0)
 
 def plot_distribution_Pk_ratio(data_dir='../data/distribution_data/', labels=True):
 	xmin, xmax, ymin, ymax = 1e-4, 1, 0.85, 1.05
@@ -1011,7 +1011,7 @@ def add_cosmo_cases():
 		color='k',
 		rotation=0)
 
-	plt.text(0.2 - xoff, 0.55 + 2 * offset - yoff,r"$\Omega_\nu / \Omega_{\rm m} = 0.009$, $N_{\rm eff} = 3.044$",
+	plt.text(0.2 - xoff, 0.55 + 2 * offset - yoff,r"$\Omega_{\nu,0} / \Omega_{\mathrm{m},0} = 0.009$, $N_{\rm eff} = 3.044$",
 		transform=plt.gca().transAxes,
 		fontsize=16,
 		color='k',
