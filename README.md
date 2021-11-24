@@ -3,6 +3,8 @@
 
 Repository for calculating cosmological obsevables and performing MCMC analysis for neutrinos with a distribution function different to a thermal Fermi-Dirac one. Also contains code to compute event rates and sensitivity at a PTOLEMY-like experiment for neutrions with a given distribution function and mass.
 
+*Note:* The plotting directory will become available once the companion paper discussing the PTOLEMY phenomenology has been released on Wednesday 1st December
+
 ## File Structure
 
 **/analysis/**
