@@ -31,9 +31,13 @@ DENSITY_FACTOR = 1394359034.3850107 / (8 * np.pi * 6.67408 * 1e-11 / 3) # Class 
 H = 0.6732117
 G = 6.67408 * 1e-11 * 6.76964163871683e-38 # Mpc^3 / (Msun s^2)
 OMEGA_M0 = 0.31580709731
-DELTA_VIR = 200
-RHO_CRIT0 = 5.042685747345e-08 # Mpc^-2
-RHO_M0 = DENSITY_FACTOR * OMEGA_M0 * RHO_CRIT0
+OMEGA_L0 = 1 - OMEGA_M0
+RHO_CRIT0 = DENSITY_FACTOR * 5.042685747345e-08 # Msun / Mpc^-3
+RHO_M0 = OMEGA_M0 * RHO_CRIT0
+RS0 = 0.0199 # rs, Mvir and eta from Tab. 1 of 1910.13388 
+MVIR = 2.03 * 1e12 # Msun
+ETA = 1.
+MSUNKPC3_TO_GEVCM3 = 26330276.95609824
 
 class_file = '../data/cosmology.dat'
 answer = input('[nu_clustering.py] Is class file located here: {}? (y/n) '.format(class_file))
@@ -49,22 +53,54 @@ for idx in range(1, len(a)):
 	ss = simps(a[:idx]**(-2), t[:idx])
 	s_arr = np.append(s_arr, ss)
 a_arr, s_arr = a[1:], s_arr
+start = 4200
+print('zmax = {}'.format(1/a_arr[start] - 1))
 
+def rho_crit(z):
+	return RHO_CRIT0 * (OMEGA_M0 * (1 + z)**3 + OMEGA_L0)
 
-def concentration(z, Mvir):
-	return 9 / (1 + z) * np.power(Mvir / (1.5 * 1e13 / H), -0.13)
+def Omega_m(z):
+	return RHO_M0 * (1 + z)**3 * np.power(rho_crit(z), -1.0)
 
-def rs(z, Mvir):
-	return 9.51 * 1e-1 * (1/concentration(z, Mvir)) * OMEGA_M0**(-1/3) * DELTA_VIR**(-1/3) * np.power(Mvir / (1e12 * H**(-1)), 1/3) * H**(-1)
+def DeltaVir(z):
+	return 18 * np.pi**2 + 82 * (Omega_m(z) - 1) - 39 * (Omega_m(z) - 1)**2
 
-def nfw_halo(r, z, Mvir):
-	rs_nfw = rs(z, Mvir)
-	c_nfw = concentration(z, Mvir)
-	rho_nfw = Mvir / (4 * np.pi * (1/(1 + z))**3 * rs_nfw**3 * (np.log(1 + c_nfw) - (c_nfw / (1 + c_nfw))))
-	return rho_nfw * np.power((r / rs_nfw) * (1 + (r / rs_nfw))**2, -1.0)
+def a(z):
+	return 0.537 + (1.025 - 0.537) * np.exp(-0.718 * z**1.08)
 
-def delta_m(r, z, Mvir):
-	return nfw_halo(r, z, Mvir) / (RHO_M0 * (1 + z)**3)
+def b(z):
+	return -0.097 + 0.024 * z
+
+def cvir_avg(z, Mvir=MVIR):
+	return 10**(a(z) + b(z) * np.log10(Mvir/(1e12 * H**(-1))))
+
+def rvir(z, Mvir=MVIR):
+	return np.power((4 * np.pi * DeltaVir(z) * rho_crit(z)) / (3 * (1 + z)**3 * Mvir), -1./3.)
+
+def cvir(z, Mvir=MVIR):
+	beta = rvir(z=0, Mvir=Mvir) / (RS0 * cvir_avg(z=0, Mvir=Mvir))
+	return beta * cvir_avg(z)
+
+def rs(z, Mvir=MVIR):
+	return rvir(z, Mvir) / cvir(z)
+
+@np.vectorize
+def N(z, Mvir=MVIR, eta=ETA):
+	integrand = lambda x : 4 * np.pi * x**2 * np.power((x/rs(z, Mvir))**eta * (1 + (x/rs(z, Mvir)))**(3 - eta), -1.0)
+	integral = quad(integrand, a=1e-3, b=rvir(z, Mvir))[0]
+	return Mvir * (1 + z)**3 * np.power(integral, -1.0)
+
+zarr = 1/a_arr[start:] - 1
+Narr = N(zarr)
+rsarr = rs(zarr)
+N_func = interp1d(zarr, Narr, kind='linear', fill_value='extrapolate')
+rs_func = interp1d(zarr, rsarr, kind='linear', fill_value='extrapolate')
+def nfw_halo(r, z, Mvir=MVIR, eta=ETA):
+	return N_func(z) * np.power((r/rs_func(z))**eta * (1 + (r/rs_func(z)))**(3 - eta), -1.0)
+
+def delta_m(r, z):
+	return nfw_halo(r, z) / (RHO_M0 * (1 + z)**3)
+
 
 def fourier(k, r, delta):
 	integrand_arr = 4 * np.pi * r * np.sin(k * r) * delta / k
@@ -106,8 +142,8 @@ def run_FD(ml, Tf=1.0, show_plot=False):
 	Rmin = 1e-3
 	Rmax = 100
 	r_arr = np.geomspace(Rmin, Rmax, 100)
-	logMvir = 12
-	Mvir = (0.7 / H) * 10**logMvir
+	logMvir = np.log10(MVIR)
+	# Mvir = (0.7 / H) * 10**logMvir
 
 	print('[nu_clustering.py] Starting mlight = {} eV, Tnu/Tnu0 = {}'.format(ml, Tf))
 	try:
@@ -115,14 +151,18 @@ def run_FD(ml, Tf=1.0, show_plot=False):
 		run = False
 	except OSError:
 		run = True
+	# run_ans = input('[nu_clustering.py] Check for fourier file (y/n)? ')
+	# if run_ans.lower()[0] == 'n':
+	# 	run = True
 
+	run = True
 	k_arr = 1/r_arr[::-1]
 	if run:
 		deltanu_f = np.array([])
 		for idx, k in enumerate(k_arr):
 			print('[nu_clustering.py] {} out of {}'.format(idx + 1, len(k_arr)), end='\r')
 			integrand_arr = np.array([])
-			for a, s in zip(a_arr, s_arr):
+			for a, s in zip(a_arr[start:], s_arr[start:]):
 				diffs = s_arr[-1] - s
 				try:
 					q = k * diffs / ml
@@ -132,12 +172,12 @@ def run_FD(ml, Tf=1.0, show_plot=False):
 						F_factor = 1.0
 					else:
 						F_factor = 0.0
-				delta = fourier(k, r_arr, delta_m(r_arr, z=(1/a) - 1, Mvir=Mvir))
+				delta = fourier(k, r_arr, delta_m(r_arr, z=(1/a) - 1))
 				integrand_arr = np.append(integrand_arr, a * delta * diffs * F_factor)
-			deltanu = 4 * np.pi * G * RHO_M0 * simps(integrand_arr, s_arr)
+			deltanu = 4 * np.pi * G * RHO_M0 * simps(integrand_arr, s_arr[start:])
 			deltanu_f = np.append(deltanu_f, deltanu)
 		np.savetxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}_Tf{}.txt'.format(logMvir, ml, Tf), deltanu_f)
-	deltanu_f = np.loadtxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}_Tf{}.txt'.format(logMvir, ml, Tf))
+	deltanu_f = np.loadtxt('clustering_data/deltanu_fourier_Mvir{}_mlight{}_Tf{}.txt'.format(np.log10(MVIR), ml, Tf))
 
 	deltanu_arr = np.array([])
 	for r in r_arr:
@@ -157,15 +197,20 @@ def run_FD(ml, Tf=1.0, show_plot=False):
 
 if __name__ == '__main__':
 	pts = input("[nu_clustering.py] num(pts): ")
-	filename = 'clustering_data/lcdm_clustering_[t]{}.txt'.format(pts)
+	filename = input('[nu_clustering.py] Insert filename: ')
+	filename = '../data/' + filename
+	lcdm = input('[nu_clustering.py] LCDM (y/n)? ')
 	print('[nu_clustering.py] Save file: {}'.format(filename))
-	#mlight_arr = np.geomspace(1e-3 * 10.0, 1e-3 * 1000.0, int(mlight_pts))
-	Tf_arr = np.linspace(0.3, 1.3, int(pts))
+	mlight_arr = np.geomspace(1e-3 * 10.0, 1e-3 * 1000.0, int(pts))
+	if lcdm.lower()[0] == 'y':
+		Tf_arr = np.ones(len(mlight_arr))
+	else:
+		Tf_arr = ((mlight_arr)/(0.08/3.))**(1./3.)
 
 	result = np.array([])
-	for Tfact in Tf_arr:
-		to_add = run_FD(ml=1.0, Tf=Tfact)
+	for idx, Tfact in enumerate(Tf_arr):
+		to_add = run_FD(ml=mlight_arr[idx], Tf=Tfact)
 		result = np.append(result, to_add)
 
-	to_save = np.vstack([Tf_arr, result]).T
-	np.savetxt(filename, to_save, header='[mlight=1.0 eV] Tf delta')
+	to_save = np.vstack([mlight_arr, Tf_arr, result]).T
+	np.savetxt(filename, to_save, header='mlight/eV Tf delta')
