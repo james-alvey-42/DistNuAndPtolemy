@@ -53,10 +53,10 @@ Repository for calculating cosmological obsevables and performing MCMC analysis 
 */nudist_forecast/* - param files for computing the fiducial sensitivity of CMB-S4 and Planck like experiments
 
 ## Publications
-If you make use of this code in your publication, please cite the papers [2111.12726] and [2112.xxxxx].
+If you make use of this code in your publication, please cite the papers [2111.12726] and [2111.14870].
 
 ## Contact
 Please email j.b.g.alvey@uva.nl, miguel.escudero@tum.de, nashwan.sabti@kcl.ac.uk or schwetz@kit.edu for any questions.
 
 [2111.12726]: https://arxiv.org/abs/2111.12726
-[2112.xxxxx]: https://arxiv.org/abs/2112.xxxxx
+[2111.14870]: https://arxiv.org/abs/2111.14870
