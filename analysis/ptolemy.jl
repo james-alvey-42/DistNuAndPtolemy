@@ -156,6 +156,7 @@ end
 function numerator(mlightest::Float64, Nb::Float64, A_beta::Float64, DEEnd::Float64, Tyrs::Float64, delta::Float64, NT::Float64, Ndata_arr::Vector{Float64}, ln_Ndata_factorial::Vector{Float64}, Ei_arr::Vector{Float64}, order::String="normal")
     Nth_arr = Nb .+ A_beta * N_beta.(Ei_arr, Tyrs, delta, mlightest, NT, order, DEEnd)
     ll0 = sum(Ndata_arr .* log.(Nth_arr) .- Nth_arr .- ln_Ndata_factorial)
+    println(-ll0)
     return -ll0
 end
 
@@ -178,7 +179,7 @@ function optimise_ptolemy(nloc::Float64, mlightest::Float64, delta::Float64, Tyr
     function to_optimise(x::Vector{Float64})
         return numerator(x[1], x[2], x[3], x[4], Tyrs, delta, NT, Ndata_arr, ln_Ndata_factorial, Ei_arr, order)
     end
-    optimal = optimize(to_optimise, [mlightest, Nb_data, 1., 0.])
+    optimal = optimize(to_optimise, [1.01 * mlightest, 1.01 * Nb_data, 1.01, 0.01])
     return optimal
 end
 
