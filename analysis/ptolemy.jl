@@ -1,6 +1,7 @@
 module Ptolemy
 using SpecialFunctions: gamma
 using QuadGK: quadgk
+using Optim: optimize
 
 function F(Ee::Float64)
     me = 511 * 1e6 # meV
@@ -143,6 +144,42 @@ end
 
 function N_total(Ei::Float64, Tyrs::Float64, delta::Float64, mlightest::Float64, n0::Float64, NT::Float64, order::String="normal", DEEnd::Float64=0.0, gamma_b::Float64=1e-5, cDM::Float64=1.)
     return N_beta(Ei, Tyrs, delta, mlightest, NT, order, DEEnd) + N_CNB(Ei, Tyrs, delta, mlightest, n0, NT, order, DEEnd, cDM) + (gamma_b * 31558149.7635456) * Tyrs / (15 * 1e3 / 50)
+end
+
+function denominator(nloc::Float64, Tyrs::Float64, delta::Float64, mlightest::Float64, Nb::Float64, A_beta::Float64, DEEnd::Float64, NT::Float64, Ei_arr::Vector{Float64}, Ndata_arr::Vector{Float64}, ln_Ndata_factorial::Vector{Float64}, order::String="normal", cDM::Float64=1.)
+    A_CNB = 1.
+    Nth_arr = Nb .+ A_beta * N_beta.(Ei_arr, Tyrs, delta, mlightest, NT, order, DEEnd) .+ A_CNB * N_CNB.(Ei_arr, Tyrs, delta, mlightest, nloc, NT, order, DEEnd, cDM)
+    ll1 = sum(Ndata_arr .* log.(Nth_arr) .- Nth_arr .- ln_Ndata_factorial)
+    return -ll1
+end
+
+function numerator(mlightest::Float64, Nb::Float64, A_beta::Float64, DEEnd::Float64, Tyrs::Float64, delta::Float64, NT::Float64, Ndata_arr::Vector{Float64}, ln_Ndata_factorial::Vector{Float64}, Ei_arr::Vector{Float64}, order::String="normal")
+    Nth_arr = Nb .+ A_beta * N_beta.(Ei_arr, Tyrs, delta, mlightest, NT, order, DEEnd)
+    ll0 = sum(Ndata_arr .* log.(Nth_arr) .- Nth_arr .- ln_Ndata_factorial)
+    return -ll0
+end
+
+function lnfactorial(N::Real)
+    if N < 20.
+        return log(gamma(N+ 1))
+    else
+        return N * log(N) - N + log(1/30 + N * (1 + 4 * N * (1 + 2 * N))) / 6. + 0.5 * log(π)
+    end
+end
+
+function optimise_ptolemy(nloc::Float64, mlightest::Float64, delta::Float64, Tyrs::Float64=1., mT::Float64=100., gamma_b::Float64=1e-5, cDM::Float64=1., order::String="normal")
+    NT = 1.9972819100287977e+25 * (mT / 100.)
+    Elow = -5000.
+    Ehigh = 10000.
+    Ei_arr = Array(LinRange(Eend0() + Elow, Eend0() + Ehigh, Integer((Ehigh - Elow)/delta)))
+    Nb_data = 1.05189 * (gamma_b/1e-5) * (Tyrs / 1.0)
+    Ndata_arr = N_total.(Ei_arr, Tyrs, delta, mlightest, nloc, NT, order, 0., gamma_b, cDM)
+    ln_Ndata_factorial = lnfactorial.(Ndata_arr)
+    function to_optimise(x::Vector{Float64})
+        return numerator(x[1], x[2], x[3], x[4], Tyrs, delta, NT, Ndata_arr, ln_Ndata_factorial, Ei_arr, order)
+    end
+    optimal = optimize(to_optimise, [mlightest, Nb_data, 1., 0.])
+    return optimal
 end
 
 end
